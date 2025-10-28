@@ -4,6 +4,18 @@ from qiskit.visualization import plot_histogram, plot_bloch_multivector
 from qiskit import QuantumCircuit as QC
 import numpy as np
 import math
+from grover import oracle 
+from grover import diffuser
+
+def init_qubits(grid):
+    
+    n = len(grid[:,0])
+    qc = QuantumCircuit(n)
+
+    # Superposition
+    qc.h(range(n))
+
+    return qc
 
 def change_grid(grid):
     
@@ -34,42 +46,6 @@ def choose_row_col(grid):
     
     else:
         print("Not an option bro")
-
-n = 5
-N = 2**n
-
-R = math.floor(math.sqrt(N) * (math.pi/4))
-
-qc = QuantumCircuit(n)
-
-# Superposition
-qc.h(range(n))
-
-# Oracle for |1000>
-def oracle(qc):
-    qc.x([0,1,2])
-    qc.h(n-1)
-    qc.mcx([0,1,2], n-1)
-    qc.h(n-1)
-    qc.x([0,1,2])
-    return qc
-
-# Diffuser
-def diffuser(qc):
-    qc.h(range(n))
-    qc.x(range(n))
-    qc.h(n-1)
-    qc.mcx([0,1,2], n-1)
-    qc.h(n-1)
-    qc.x(range(n))
-    qc.h(range(n))
-    return qc
-
-# Grover iterations
-for _ in range(R):
-    oracle(qc)
-    diffuser(qc)
-
 
 def main():
     
