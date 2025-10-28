@@ -15,6 +15,8 @@ def init_qubits(grid):
     # Superposition
     qc.h(range(n))
 
+    print(qc)
+
     return qc
 
 def change_grid(grid):
@@ -48,9 +50,12 @@ def choose_row_col(grid):
         print("Not an option bro")
 
 def main():
-    
     grid = np.zeros([5,5])
     change_grid(grid)
-    choose_row_col(grid)
+    init_qubits(grid)
+    """
+    grid = np.zeros([5,5])
+    change_grid(grid)
+    choose_row_col(grid)"""
     
 main()

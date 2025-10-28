@@ -4,12 +4,12 @@ import numba
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Pauli, SparsePauliOp, Statevector
 from qiskit.visualization import plot_histogram, plot_bloch_multivector
-from qiskit_aer import AerSimulator
+#from qiskit_aer import AerSimulator
 from qiskit.circuit import Parameter, ParameterVector
 import qiskit.qasm3
-from qiskit_ibm_runtime.fake_provider import FakeVigoV2
+#from qiskit_ibm_runtime.fake_provider import FakeVigoV2
 from qiskit.transpiler.preset_passmanagers import generate_preset_pass_manager
-from qiskit_ibm_runtime import SamplerV2 as Sampler, EstimatorV2 as Estimator, QiskitRuntimeService
+#from qiskit_ibm_runtime import SamplerV2 as Sampler, EstimatorV2 as Estimator, QiskitRuntimeService
 
 n = 4
 N = 2**n
@@ -44,7 +44,7 @@ def diffuser(qc):
 for _ in range(R):
     oracle(qc)
     diffuser(qc)
-
+"""
 qc.measure_all()
 display(qc.draw("mpl"))
 
@@ -60,3 +60,4 @@ result = job.result()
 counts = result[0].data["meas"].get_counts()
 print(counts)
 plot_histogram(counts)
+"""
