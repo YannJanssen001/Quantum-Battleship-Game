@@ -12,6 +12,7 @@ class QuantumBattleshipGUI:
         self.region_size = region_size
         self.ships = ships or []
         self.found_ships = set()  # ✅ keeps track of discovered ships
+        self.selection_mode = "square"  # "square", "row", or "column"
         
         self.root.title("🌌 Quantum Battleship")
         self.cell_size = 80
@@ -29,12 +30,43 @@ class QuantumBattleshipGUI:
         self.cells = [[None for _ in range(self.grid_size)] for _ in range(self.grid_size)]
         self.draw_grid()
 
+        # Selection mode controls
+        mode_frame = tk.Frame(root)
+        mode_frame.pack(pady=5)
+        
+        tk.Label(mode_frame, text="Selection Mode:").pack(side=tk.LEFT, padx=5)
+        
+        self.mode_var = tk.StringVar(value="square")
+        modes = [("2x2 Square", "square"), ("Row", "row"), ("Column", "column")]
+        
+        for text, mode in modes:
+            tk.Radiobutton(
+                mode_frame, 
+                text=text, 
+                variable=self.mode_var, 
+                value=mode,
+                command=self.change_selection_mode
+            ).pack(side=tk.LEFT, padx=5)
+
         # Fire button
         self.shoot_btn = tk.Button(root, text="🚀 Fire Grover Shot", command=self.fire_grover_shot)
         self.shoot_btn.pack(pady=10)
 
         # Mouse click binding
         self.canvas.bind("<Button-1>", self.on_click)
+
+    def change_selection_mode(self):
+        """Update selection mode and clear current selection."""
+        self.selection_mode = self.mode_var.get()
+        # Clear current selection when mode changes
+        if self.region_rect:
+            for r in self.region_rect:
+                self.canvas.itemconfig(r, fill="white")
+        # Restore found ships color
+        for (x, y) in self.found_ships:
+            self.canvas.itemconfig(self.cells[x][y], fill="#ff3333")
+        self.region_rect = []
+        self.selected_region = []
 
     # --- Helper conversion functions ---
     def coords_to_index(self, x, y):
@@ -80,13 +112,30 @@ class QuantumBattleshipGUI:
 
         self.region_rect = []
         self.selected_region = []
-        for dx in range(self.region_size):
-            for dy in range(self.region_size):
-                rr, cc = row + dx, col + dy
-                if 0 <= rr < self.grid_size and 0 <= cc < self.grid_size:
-                    self.canvas.itemconfig(self.cells[rr][cc], fill="#99ccff")
-                    self.region_rect.append(self.cells[rr][cc])
-                    self.selected_region.append((rr, cc))
+        
+        if self.selection_mode == "square":
+            # Original 2x2 square selection
+            for dx in range(self.region_size):
+                for dy in range(self.region_size):
+                    rr, cc = row + dx, col + dy
+                    if 0 <= rr < self.grid_size and 0 <= cc < self.grid_size:
+                        self.canvas.itemconfig(self.cells[rr][cc], fill="#99ccff")
+                        self.region_rect.append(self.cells[rr][cc])
+                        self.selected_region.append((rr, cc))
+        
+        elif self.selection_mode == "row":
+            # Select entire row
+            for cc in range(self.grid_size):
+                self.canvas.itemconfig(self.cells[row][cc], fill="#99ccff")
+                self.region_rect.append(self.cells[row][cc])
+                self.selected_region.append((row, cc))
+        
+        elif self.selection_mode == "column":
+            # Select entire column
+            for rr in range(self.grid_size):
+                self.canvas.itemconfig(self.cells[rr][col], fill="#99ccff")
+                self.region_rect.append(self.cells[rr][col])
+                self.selected_region.append((rr, col))
 
     # --- Fire a Grover shot ---
     def fire_grover_shot(self):
