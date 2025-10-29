@@ -115,7 +115,7 @@ def run_grover(n_qubits: int, target_index: int, shots: int = 1024, plot: bool =
     qc.h(range(n_qubits))  # start in uniform superposition
 
     # Optimal number of iterations: ~pi/4 * sqrt(N)
-    n_iterations = 1 #max(1, int(math.floor((math.pi / 4) * math.sqrt(2 ** n_qubits) / 2)))
+    n_iterations = max(1, int(math.floor((math.pi / 4) * math.sqrt(2 ** n_qubits) / 2)))
 
     for _ in range(n_iterations):
         qc.compose(oracle, inplace=True)
@@ -140,4 +140,4 @@ def run_grover(n_qubits: int, target_index: int, shots: int = 1024, plot: bool =
 # -------------------------------------------------------------------
 if __name__ == "__main__":
     # Example: 5 qubits (32 possible cells), hidden ship at cell index 13
-    run_grover(n_qubits=8, target_index=33, shots=128)
+    run_grover(n_qubits=8, target_index=33, shots=1024)
