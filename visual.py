@@ -4,6 +4,7 @@ from tkinter import messagebox
 import math
 from grovershot import grover_shot
 
+
 class QuantumBattleshipGUI:
     def __init__(self, root, grid_size=5, region_size=2, ships=None):
         self.root = root
@@ -14,7 +15,11 @@ class QuantumBattleshipGUI:
         
         self.root.title("🌌 Quantum Battleship")
         self.cell_size = 80
-        self.canvas = tk.Canvas(root, width=self.grid_size*self.cell_size, height=self.grid_size*self.cell_size)
+        self.canvas = tk.Canvas(
+            root,
+            width=self.grid_size * self.cell_size,
+            height=self.grid_size * self.cell_size
+        )
         self.canvas.pack()
 
         self.start_cell = None
@@ -40,7 +45,11 @@ class QuantumBattleshipGUI:
         return divmod(index, self.grid_size)
 
     def coords_to_indices(self, coords):
-        return [self.coords_to_index(x, y) for x, y in coords if 0 <= x < self.grid_size and 0 <= y < self.grid_size]
+        return [
+            self.coords_to_index(x, y)
+            for x, y in coords
+            if 0 <= x < self.grid_size and 0 <= y < self.grid_size
+        ]
 
     # --- Draw grid ---
     def draw_grid(self):
@@ -48,7 +57,9 @@ class QuantumBattleshipGUI:
             for j in range(self.grid_size):
                 x0, y0 = j * self.cell_size, i * self.cell_size
                 x1, y1 = x0 + self.cell_size, y0 + self.cell_size
-                rect = self.canvas.create_rectangle(x0, y0, x1, y1, outline="gray", width=2, fill="white")
+                rect = self.canvas.create_rectangle(
+                    x0, y0, x1, y1, outline="gray", width=2, fill="white"
+                )
                 self.cells[i][j] = rect
 
     # --- Handle region selection ---
@@ -77,13 +88,17 @@ class QuantumBattleshipGUI:
                     self.region_rect.append(self.cells[rr][cc])
                     self.selected_region.append((rr, cc))
 
+    # --- Fire a Grover shot ---
     def fire_grover_shot(self):
         if not self.selected_region:
             messagebox.showwarning("⚠️ Warning", "Please select a region first!")
             return
 
         region_indices = self.coords_to_indices(self.selected_region)
-        ship_indices = self.coords_to_indices(self.ships)
+
+        # ✅ Only consider ships that have not yet been found
+        remaining_ships = [s for s in self.ships if s not in self.found_ships]
+        ship_indices = self.coords_to_indices(remaining_ships)
         ships_in_region = [s for s in ship_indices if s in region_indices]
 
         n_qubits = math.ceil(math.log2(self.grid_size * self.grid_size))
@@ -107,7 +122,7 @@ class QuantumBattleshipGUI:
             msg = f"💥 Hit! Ship detected at cell index {measured}!"
             color = "#ff3333"
             coords = self.index_to_coords(measured)
-            self.found_ships.add(coords)  # ✅ remember found ship
+            self.found_ships.add(coords)  # ✅ Remember found ship
         else:
             msg = f"💧 Miss! No ship detected in this region."
             color = "#dddddd"
