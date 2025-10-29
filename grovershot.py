@@ -1,62 +1,40 @@
-import numpy as np
-
-import matplotlib.pyplot as plt
-from qiskit.transpiler import generate_preset_pass_manager
-from qiskit_ibm_runtime import QiskitRuntimeService
-from qiskit_aer import AerSimulator
-
-from qiskit.circuit import Parameter
-
-from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister
-from qiskit.visualization import plot_histogram
-from qiskit.quantum_info import Statevector
-
-from qiskit_ibm_runtime import SamplerV2 as Sampler
-from qiskit.visualization import plot_distribution
-
-
-from qiskit import QuantumCircuit
-from qiskit_aer import AerSimulator
-from qiskit.visualization import plot_histogram
-import matplotlib.pyplot as plt
-
-from qiskit.visualization import plot_histogram
-import matplotlib.pyplot as plt
-
-# grover_engine.py
-from qiskit import QuantumCircuit
-from qiskit_aer import AerSimulator
-from qiskit.visualization import plot_histogram
-import matplotlib.pyplot as plt
 import math
+from qiskit import QuantumCircuit
+from qiskit_aer import AerSimulator
+
 
 # -------------------------------------------------------------------
-# 🧠 Build an Oracle that marks one "ship" state with a phase flip
+# 🧠 Oracle — marks one or more hidden ships (target states)
 # -------------------------------------------------------------------
-def build_oracle(n_qubits: int, target_index: int) -> QuantumCircuit:
+def build_oracle(n_qubits: int, target_indices: list[int]) -> QuantumCircuit:
+    """
+    Oracle that flips the phase of each marked (ship) state.
+    """
     qc = QuantumCircuit(n_qubits)
-    binary_target = format(target_index, f'0{n_qubits}b')
 
-    # Flip qubits for bits that are 0 so that the mcx hits only |target>
-    for i, bit in enumerate(reversed(binary_target)):
-        if bit == '0':
-            qc.x(i)
+    for target_index in target_indices:
+        binary_target = format(target_index, f'0{n_qubits}b')
 
-    # Multi-controlled Z (as H–MCX–H on last qubit)
-    qc.h(n_qubits - 1)
-    qc.mcx(list(range(n_qubits - 1)), n_qubits - 1)
-    qc.h(n_qubits - 1)
+        # Flip qubits for bits that are 0 so that the mcx hits only |target>
+        for i, bit in enumerate(reversed(binary_target)):
+            if bit == '0':
+                qc.x(i)
 
-    # Uncompute the X gates
-    for i, bit in enumerate(reversed(binary_target)):
-        if bit == '0':
-            qc.x(i)
+        # Multi-controlled Z (implemented as H–MCX–H on the last qubit)
+        qc.h(n_qubits - 1)
+        qc.mcx(list(range(n_qubits - 1)), n_qubits - 1)
+        qc.h(n_qubits - 1)
+
+        # Uncompute the X gates
+        for i, bit in enumerate(reversed(binary_target)):
+            if bit == '0':
+                qc.x(i)
 
     return qc
 
 
 # -------------------------------------------------------------------
-# 💫 Build the Diffuser (inversion about the mean)
+# 💫 Diffuser (inversion about the mean)
 # -------------------------------------------------------------------
 def build_diffuser(n_qubits: int) -> QuantumCircuit:
     qc = QuantumCircuit(n_qubits)
@@ -69,53 +47,36 @@ def build_diffuser(n_qubits: int) -> QuantumCircuit:
     qc.h(range(n_qubits))
     return qc
 
-#########
-#HEATMAP
-#########
-def plot_grover_heatmap(counts, n_qubits):
-    """
-    Convert Grover counts to a 2D heatmap.
-    Works best when 2^n_qubits is a perfect square (e.g. 4, 16, 64, 256...).
-    """
-    N = 2 ** n_qubits
-    grid_size = int(np.sqrt(N))
-
-    # Convert bitstrings → integer indices
-    values = np.zeros((grid_size, grid_size))
-    for bitstring, freq in counts.items():
-        idx = int(bitstring, 2)
-        x, y = divmod(idx, grid_size)
-        values[x, y] = freq
-
-    # Normalize for color intensity
-    norm = values / np.max(values)
-
-    plt.figure(figsize=(6, 5))
-    plt.imshow(norm, cmap="plasma", origin="lower")
-    plt.colorbar(label="Relative frequency")
-    plt.title(f"Grover heatmap — {grid_size}×{grid_size} grid ({n_qubits} qubits)")
-    plt.xlabel("Column")
-    plt.ylabel("Row")
-    plt.tight_layout()
-    plt.show()
 
 # -------------------------------------------------------------------
-# 🚀 Run Grover's algorithm
+# 🚀 Run Grover’s algorithm for one shot on possibly multiple ships
 # -------------------------------------------------------------------
-def run_grover(n_qubits: int, target_index: int, shots: int = 1024, plot: bool = True):
+def grover_shot(n_qubits: int, target_indices: list[int], shots: int = 1):
     """
-    Runs Grover's algorithm on n_qubits for a target_index (0–2^n - 1)
-    Returns the measured counts dictionary.
-    """
+    Run Grover's search for one or more targets (ships).
 
-    oracle = build_oracle(n_qubits, target_index)
+    Returns a dictionary with:
+      - 'hit': True/False
+      - 'measured_index': int (most probable state)
+      - 'measured_state': str (bitstring)
+      - 'iterations': number of Grover iterations used
+      - 'counts': full measurement results
+    """
+    if not target_indices:
+        raise ValueError("At least one target index (ship) must be provided.")
+
+    M = len(target_indices)            # number of marked states
+    N = 2 ** n_qubits                  # total states
+
+    # 🧮 Use half of the optimal iterations (for gameplay uncertainty)
+    n_iterations = max(1, int(math.floor((math.pi / 4) * math.sqrt(N / M))))
+
+    # --- Build the quantum circuit ---
+    oracle = build_oracle(n_qubits, target_indices)
     diffuser = build_diffuser(n_qubits)
 
     qc = QuantumCircuit(n_qubits)
-    qc.h(range(n_qubits))  # start in uniform superposition
-
-    # Optimal number of iterations: ~pi/4 * sqrt(N)
-    n_iterations = 1 #max(1, int(math.floor((math.pi / 4) * math.sqrt(2 ** n_qubits) / 2)))
+    qc.h(range(n_qubits))  # uniform superposition
 
     for _ in range(n_iterations):
         qc.compose(oracle, inplace=True)
@@ -123,21 +84,30 @@ def run_grover(n_qubits: int, target_index: int, shots: int = 1024, plot: bool =
 
     qc.measure_all()
 
+    # --- Run on simulator ---
     sim = AerSimulator()
     result = sim.run(qc, shots=shots).result()
     counts = result.get_counts()
 
-    if plot:
-        plot_grover_heatmap(counts, n_qubits)
+    # --- Extract measured state ---
+    measured_state = max(counts, key=counts.get)
+    measured_index = int(measured_state, 2)
+    hit = measured_index in target_indices
 
-
-    print(f"🔎 Most likely ship cell: {max(counts, key=counts.get)} (target was {target_index})")
-    return counts
+    return {
+        "hit": hit,
+        "measured_index": measured_index,
+        "measured_state": measured_state,
+        "iterations": n_iterations,
+        "counts": counts,
+    }
 
 
 # -------------------------------------------------------------------
-# 🧩 Example test
+# 🧩 Standalone test
 # -------------------------------------------------------------------
 if __name__ == "__main__":
-    # Example: 5 qubits (32 possible cells), hidden ship at cell index 13
-    run_grover(n_qubits=8, target_index=33, shots=128)
+    n_qubits = 4          # 16 possible positions
+    target_indices = [3, 9]  # two ships
+    result = grover_shot(n_qubits, target_indices)
+    print(result)
