@@ -3,7 +3,7 @@ import tkinter as tk
 from visual import QuantumBattleshipGUI
 
 def main():
-    grid_size = 5
+    grid_size = 7
     region_size = 2
     ships = [(0,0), (0,1), (1,2), (3,4)]  # Example ship positions
 
