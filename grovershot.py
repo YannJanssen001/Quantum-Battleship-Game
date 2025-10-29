@@ -107,6 +107,7 @@ def grover_shot(n_qubits: int, target_indices: list[int], shots: int = 1):
 # 🧩 Standalone test
 # -------------------------------------------------------------------
 if __name__ == "__main__":
+    # Example: 5 qubits (32 possible cells), hidden ship at cell index 13
     n_qubits = 4          # 16 possible positions
     target_indices = [3, 9]  # two ships
     result = grover_shot(n_qubits, target_indices)
