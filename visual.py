@@ -12,13 +12,13 @@ class QuantumBattleshipGUI:
         self.grid_size = grid_size
         self.region_size = region_size
         self.ships = ships or []
-        self.found_ships = set()  # ✅ track discovered ships
+        self.found_ships = set()  # ✅ discovered ships (locked squares)
 
         self.root.title("🌊 Quantum Battleship")
         self.cell_size = 80
         canvas_size = self.grid_size * self.cell_size
 
-        # --- Background frame ---
+        # --- UI container ---
         self.frame = tk.Frame(root, bg="#003366")
         self.frame.pack(fill="both", expand=True)
 
@@ -31,11 +31,10 @@ class QuantumBattleshipGUI:
         )
         self.canvas.pack(padx=20, pady=20)
 
-        # --- Locate assets directory ---
+        # --- Asset loading ---
         base_dir = os.path.dirname(os.path.abspath(__file__))
         assets_dir = os.path.join(base_dir, "assets")
 
-        # --- Load and resize images safely ---
         def safe_load(filename):
             path = os.path.join(assets_dir, filename)
             if os.path.exists(path):
@@ -54,7 +53,7 @@ class QuantumBattleshipGUI:
         self.ship_img = safe_load("ship.png")
         self.splash_img = safe_load("splash.png")
 
-        # --- Title & instructions ---
+        # --- Labels ---
         title_label = tk.Label(
             self.frame,
             text="⚓ Quantum Battleship ⚓",
@@ -74,12 +73,10 @@ class QuantumBattleshipGUI:
         instr_label.pack(pady=(5, 10))
 
         # --- Grid setup ---
-        self.start_cell = None
-        self.region_rect = None
-        self.selected_region = []
         self.cells = [[None for _ in range(self.grid_size)] for _ in range(self.grid_size)]
         self.cell_overlays = [[None for _ in range(self.grid_size)] for _ in range(self.grid_size)]
-
+        self.region_rect = None
+        self.selected_region = []
         self.draw_grid()
 
         # --- Fire button ---
@@ -94,10 +91,10 @@ class QuantumBattleshipGUI:
         )
         self.shoot_btn.pack(pady=15)
 
-        # --- Bind mouse click ---
+        # --- Mouse binding ---
         self.canvas.bind("<Button-1>", self.on_click)
 
-    # --- Helper conversions ---
+    # --- Helpers ---
     def coords_to_index(self, x, y):
         return x * self.grid_size + y
 
@@ -111,7 +108,7 @@ class QuantumBattleshipGUI:
             if 0 <= x < self.grid_size and 0 <= y < self.grid_size
         ]
 
-    # --- Draw water grid ---
+    # --- Draw grid background ---
     def draw_grid(self):
         for i in range(self.grid_size):
             for j in range(self.grid_size):
@@ -129,7 +126,7 @@ class QuantumBattleshipGUI:
                 )
                 self.cells[i][j] = rect
 
-    # --- Click handler ---
+    # --- Region selection ---
     def on_click(self, event):
         col = event.x // self.cell_size
         row = event.y // self.cell_size
@@ -138,7 +135,7 @@ class QuantumBattleshipGUI:
         self.highlight_region(row, col)
 
     def highlight_region(self, row, col):
-        # Clear highlights but keep found ships red
+        # Reset previous highlights (keep ships red)
         for i in range(self.grid_size):
             for j in range(self.grid_size):
                 if (i, j) not in self.found_ships:
@@ -158,10 +155,26 @@ class QuantumBattleshipGUI:
             messagebox.showwarning("⚠️ Warning", "Please select a region first!")
             return
 
+        # If the region only includes already-found ships, skip search
+        if all(cell in self.found_ships for cell in self.selected_region):
+            messagebox.showinfo("🪙 Info", "This region already contains discovered ships.")
+            return
+
+        # Convert to indices
         region_indices = self.coords_to_indices(self.selected_region)
         remaining_ships = [s for s in self.ships if s not in self.found_ships]
         ship_indices = self.coords_to_indices(remaining_ships)
         ships_in_region = [s for s in ship_indices if s in region_indices]
+
+        # If region includes found ships, remove them from search
+        region_indices = [
+            idx for idx in region_indices
+            if self.index_to_coords(idx) not in self.found_ships
+        ]
+
+        if not region_indices:
+            messagebox.showinfo("🪙 Info", "You already scanned this area — try another region.")
+            return
 
         n_qubits = math.ceil(math.log2(self.grid_size * self.grid_size))
 
@@ -175,15 +188,22 @@ class QuantumBattleshipGUI:
 
         if hit and measured is not None:
             coords = self.index_to_coords(measured)
-            self.found_ships.add(coords)
-            msg = f"💥 Hit! Ship detected at cell index {measured}!"
-            self.place_marker(coords, hit=True)
+            if coords not in self.found_ships:  # ✅ only mark once
+                self.found_ships.add(coords)
+                msg = f"💥 Hit! Ship detected at cell index {measured}!"
+                self.place_marker(coords, hit=True)
+            else:
+                msg = f"🪙 Ship at index {measured} was already found."
         else:
             msg = f"💧 Miss! No ship detected in this region."
-            self.place_marker(self.selected_region[0], hit=False)
+            # Avoid overwriting any ship cells
+            for cell in self.selected_region:
+                if cell not in self.found_ships:
+                    self.place_marker(cell, hit=False)
 
         messagebox.showinfo("Grover Result", msg)
 
+        # ✅ Win condition
         if self.all_ships_found():
             messagebox.showinfo("🏁 Victory!", "You’ve found all enemy ships!")
             self.shoot_btn.config(state="disabled")
@@ -193,6 +213,10 @@ class QuantumBattleshipGUI:
         x, y = coords
         cx = y * self.cell_size + self.cell_size // 2
         cy = x * self.cell_size + self.cell_size // 2
+
+        # Prevent overwriting already-found ships
+        if (x, y) in self.found_ships and not hit:
+            return
 
         if self.cell_overlays[x][y]:
             self.canvas.delete(self.cell_overlays[x][y])
