@@ -8,9 +8,10 @@ class GameController:
     Handles communication between the visual interface and game state.
     """
     
-    def __init__(self, grid_size=8, num_ships=8):
-        self.game = QuantumBattleshipGame(grid_size, num_ships)
-        self.game.print_debug_info()
+    def __init__(self, grid_size=8, num_ships=8, auto_place_ships=True):
+        self.game = QuantumBattleshipGame(grid_size, num_ships, auto_place_ships)
+        if auto_place_ships:
+            self.game.print_debug_info()
     
     def get_found_ships(self):
         """Get the set of found ship coordinates."""

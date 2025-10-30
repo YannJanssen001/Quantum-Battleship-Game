@@ -10,11 +10,15 @@ class QuantumBattleshipGame:
     Handles ship placement, coordinate conversions, game rules, and quantum shots.
     """
     
-    def __init__(self, grid_size=8, num_ships=8):
+    def __init__(self, grid_size=8, num_ships=8, auto_place_ships=True):
         self.grid_size = grid_size
         self.num_ships = num_ships
-        self.ships = self.generate_random_ships()
         self.found_ships = set()
+        
+        if auto_place_ships:
+            self.ship_positions = self.generate_random_ships()
+        else:
+            self.ship_positions = set()  # Will be set manually
         
     def generate_random_ships(self):
         """Generate random ship positions ensuring no duplicates."""
@@ -84,7 +88,8 @@ class QuantumBattleshipGame:
         
         # Convert to indices and filter out found ships
         region_indices = self.coords_to_indices(selected_region)
-        remaining_ships = [s for s in self.ships if s not in self.found_ships]
+        # Find which ships (if any) are in the target region
+        remaining_ships = [s for s in self.ship_positions if s not in self.found_ships]
         ship_indices = self.coords_to_indices(remaining_ships)
         ships_in_region = [s for s in ship_indices if s in region_indices]
         
@@ -147,14 +152,14 @@ class QuantumBattleshipGame:
     
     def is_game_won(self):
         """Check if all ships have been found."""
-        return set(self.ships) == self.found_ships
+        return set(self.ship_positions) == self.found_ships
     
     def get_game_stats(self):
         """Get current game statistics."""
         return {
             "ships_found": len(self.found_ships),
-            "total_ships": len(self.ships),
-            "ships_remaining": len(self.ships) - len(self.found_ships),
+            "total_ships": len(self.ship_positions),
+            "ships_remaining": len(self.ship_positions) - len(self.found_ships),
             "grid_size": f"{self.grid_size}x{self.grid_size}",
             "total_cells": self.grid_size * self.grid_size,
             "qubits_needed": math.ceil(math.log2(self.grid_size * self.grid_size))
@@ -163,7 +168,7 @@ class QuantumBattleshipGame:
     def print_debug_info(self):
         """Print debug information about ship placement and game state."""
         stats = self.get_game_stats()
-        print(f"Ships placed at: {self.ships}")
+        print(f"Ships placed at: {self.ship_positions}")
         print(f"Grid size: {stats['grid_size']} = {stats['total_cells']} cells")
         print(f"Qubits needed: {stats['qubits_needed']}")
         print(f"Ships found: {stats['ships_found']}/{stats['total_ships']}")
