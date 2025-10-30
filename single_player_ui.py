@@ -552,7 +552,7 @@ class SinglePlayerBattleshipUI:
     def confirm_ship_placement(self):
         """Confirm ship placement and start battle."""
         if len(self.placed_ships) < 8:
-            messagebox.showwarning("Incomplete", "Please place all 8 ships!")
+            messagebox.showwarning("Incomplete", "Please place all 8 ships!", parent=self.root)
             return
             
         # Set ships in game controller
@@ -578,7 +578,11 @@ class SinglePlayerBattleshipUI:
         # Hide ship counter
         self.ship_counter.pack_forget()
         
-        messagebox.showinfo("Battle Begins!", f"Ship placement complete! Facing {difficulty_names[selected_difficulty]} AI. Target the enemy fleet!")
+        messagebox.showinfo("Battle Begins!", f"Ship placement complete! Facing {difficulty_names[selected_difficulty]} AI. Target the enemy fleet!", parent=self.root)
+        
+        # Ensure the main window stays on top and focused after dialog
+        self.root.lift()
+        self.root.focus_force()
         
     def set_targeting_mode(self, mode):
         """Set the targeting mode and highlight selected button."""
@@ -628,13 +632,16 @@ class SinglePlayerBattleshipUI:
         result = self.ai_controller.fire_shot(self.selected_region)
         
         if "error" in result:
-            messagebox.showwarning("Error", result["error"])
+            messagebox.showwarning("Error", result["error"], parent=self.root)
             return
             
         # Update AI board display with appropriate images
         if result["type"] == "hit":
             coords_info = f"at {result['coords']}" if result.get("coords") else ""
-            messagebox.showinfo("Result", f"🎯 HIT! Enemy ship destroyed {coords_info}!\n\nQuantum measurement: {result.get('message', '')}")
+            messagebox.showinfo("Result", f"🎯 HIT! Enemy ship destroyed {coords_info}!\n\nQuantum measurement: {result.get('message', '')}", parent=self.root)
+            # Ensure window focus after dialog
+            self.root.lift()
+            self.root.focus_force()
             # Place ship image only on the specific measured coordinate
             if "coords" in result and self.ship_img:
                 hit_row, hit_col = result["coords"]
@@ -644,7 +651,10 @@ class SinglePlayerBattleshipUI:
                 self.ai_overlays[hit_row][hit_col] = ship_overlay
         else:
             coords_info = f"Measured position: {result['coords']}" if result.get("coords") else "No measurement"
-            messagebox.showinfo("Result", f"💧 MISS! Quantum scan found no ships.\n{coords_info}\n\nDetails: {result.get('message', '')}")
+            messagebox.showinfo("Result", f"💧 MISS! Quantum scan found no ships.\n{coords_info}\n\nDetails: {result.get('message', '')}", parent=self.root)
+            # Ensure window focus after dialog
+            self.root.lift()
+            self.root.focus_force()
             # Place splash image only on the specific measured coordinate (not entire region)
             if "coords" in result and self.splash_img:
                 miss_row, miss_col = result["coords"]
@@ -660,7 +670,7 @@ class SinglePlayerBattleshipUI:
         
         # Check if player won
         if self.ai_controller.is_game_won():
-            messagebox.showinfo("VICTORY!", "🏆 You destroyed the enemy fleet! YOU WIN!")
+            messagebox.showinfo("VICTORY!", "🏆 You destroyed the enemy fleet! YOU WIN!", parent=self.root)
             self.player_turn = False
             return
             
@@ -811,11 +821,17 @@ class SinglePlayerBattleshipUI:
                         cy = miss_row * self.cell_size + self.cell_size // 2
                         splash_overlay = self.player_canvas.create_image(cx, cy, image=self.splash_img)
         
-        messagebox.showinfo("AI Turn", message)
+        messagebox.showinfo("AI Turn", message, parent=self.root)
+        
+        # Ensure window focus after dialog
+        self.root.lift()
+        self.root.focus_force()
         
         # Check if AI won
         if self.player_controller.is_game_won():
-            messagebox.showinfo("DEFEAT!", "The AI destroyed your fleet! GAME OVER!")
+            messagebox.showinfo("DEFEAT!", "The AI destroyed your fleet! GAME OVER!", parent=self.root)
+            self.root.lift()
+            self.root.focus_force()
             return
             
         # Player's turn again
