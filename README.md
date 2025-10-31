@@ -1,16 +1,16 @@
-# Quantum Battleship 🚢⚛️
+# Quantum Battleships using IBM's library QISKIT
 
-A revolutionary battleship game that demonstrates real quantum computing principles through interactive gameplay. Experience quantum mechanics concepts like Grover's algorithm, Elitzur-Vaidman bomb testing, and the quantum Zeno effect in an engaging strategic game.
+A custom-made battleship game that demonstrates quantum computing principles through interactive gameplay. Experience quantum mechanics concepts like Grover's algorithm, Elitzur-Vaidman bomb testing, and the quantum Zeno effect in this strategic game.
 
-## 🎯 Overview
+##  Overview
 
-Quantum Battleship transforms the classic naval strategy game by incorporating three fundamental quantum mechanics principles as weapons:
+Quantum Battleships transforms the classic game by incorporating three fundamental quantum mechanics principles as weapons/utlities:
 
 - **Grover Shot**: Quantum search algorithm for high-accuracy targeting
-- **EV Scan**: Interaction-free measurement for non-destructive reconnaissance  
+- **EV Scan**: Interaction-free measurement for non-destructive wavefuctions  
 - **Zeno Defense**: Quantum Zeno effect for measurement-based protection
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -19,7 +19,7 @@ Quantum Battleship transforms the classic naval strategy game by incorporating t
 
 ### Installation
 
-1. **Clone the repository:**
+1. **Clone this repository:**
    ```bash
    git clone https://github.com/Tangy-Cheese/Qiskit.git
    cd Qiskit
@@ -35,45 +35,45 @@ Quantum Battleship transforms the classic naval strategy game by incorporating t
    python main.py
    ```
 
-## 🎮 How to Play
+## How to Play
 
 ### Game Modes
 
 Choose between two game modes from the main menu:
 
-- **Single Player**: Play against an AI opponent with adjustable difficulty
+- **Single Player**: Play against an AI with varying difficulty levels
 - **Local Multiplayer**: Two players take turns on the same computer
 
-### Setup Phase
+### Set up
 
 1. **Ship Placement**: Each player places 8 ships on their 8×8 grid
-   - Click squares to place/remove ships manually
-   - Use "Random Ships" for automatic placement
-   - Click "Ready for Battle" when finished
+   - Click squares to place or remove ships
+   - Use "Random Ships" for a randomised placement
+   - Click "Ready for Battle" when finished to confirm the grid
 
-2. **Turn Structure**: Players alternate turns, each getting one action per turn
+2. **Turn Structure**: Players alternate turns, with one action per turn
 
-### Battle Phase
+### Battle 
 
 #### Targeting Modes
 
-Select your targeting pattern before attacking:
+There are four targetting modes to choose from before confirming an attack:
 
 - **Classical**: Single square targeting (1×1)
-- **2x2 Grid**: Quantum targeting region (2×2) 
-- **Full Row**: Target entire horizontal row
-- **Full Column**: Target entire vertical column
+- **2x2 Grid**: Quantum targeting region using Grover's algorithm (2×2) 
+- **Full Row**: Quantum target entire horizontal row using Grover's algorithm
+- **Full Column**: Quantum target entire vertical column using Grover's algorithm
 
 #### Quantum Weapons
 
-**🎯 Grover Shot (Direct Attack)**
-- **Targeting**: Requires 2×2 region selection
-- **Effect**: 85% hit probability when ships are in target region
-- **Physics**: Uses Grover's algorithm for quantum amplitude amplification
-- **Strategy**: High-accuracy weapon for confirmed targets
+**Grover Shot**
+- **Targeting**: Requires the given target selection
+- **Effect**: 85% hit probability when ships are in target 
+- **Physics**: Uses Grover's algorithm for amplitude amplification
+- **Strategy**: High-accuracy weapon for scattered targets
 
-**🔍 EV Scan (Stealth Reconnaissance)**
-- **Targeting**: Requires 2×2 region selection
+**EV Scan**
+- **Targeting**: Requires the given target selection
 - **Effect**: Detects ship presence without destroying them
 - **Physics**: Elitzur-Vaidman bomb tester for interaction-free measurement
 - **Results**:
@@ -82,33 +82,33 @@ Select your targeting pattern before attacking:
   - `Interaction`: Ships damaged but survive
   - `Inconclusive`: Quantum interference prevented clear detection
 
-**🛡️ Zeno Defense (Quantum Protection)**
-- **Targeting**: Select squares on your own board
-- **Effect**: Protects ships from enemy quantum attacks
-- **Physics**: Quantum Zeno effect freezes quantum evolution through frequent measurement
+**Zeno Defense**
+- **Targeting**: Select ships on your own board
+- **Effect**: Protects ships from enemy quantum attacks by reducing the amplitude amplification from Grover Shot.
+- **Physics**: Quantum Zeno effect freezes evolution through frequent measurements
 - **Duration**: Protection lasts 1 round
 - **Effectiveness**: 90% (maximum) or 60% (partial) protection
 
-**⚔️ Classical Shot (Traditional Attack)**
+**Classical Shot**
 - **Targeting**: Single square selection
-- **Effect**: Standard hit/miss mechanics
-- **Strategy**: Reliable but limited to one target
+- **Effect**: Standard battleship mechanics
+- **Strategy**: Reliable and choice based but limited to one target
 
 ### Game Flow
 
-1. **Select Targeting Mode**: Choose appropriate targeting pattern
+1. **Targeting selection**: Choose appropriate targeting pattern
 2. **Select Target**: Click on enemy board to highlight target region
 3. **Choose Weapon**: Click weapon button to fire
 4. **View Results**: See attack outcome and effects
-5. **Pass Turn**: Click "PASS TO PLAYER X" to end your turn
+5. **Pass Turn**: Click "PASS TO PLAYER X" to end your turn. Singleplayer automatically switches to AI.
 
 ### Winning Conditions
 
 - **Victory**: Destroy all enemy ships
-- **Strategy**: Balance offensive attacks with defensive protection
+- **Strategy**: Balance offensive attacks with defensive protection when number of ships are low
 - **Resource Management**: Each quantum weapon has strategic trade-offs
 
-## ⚛️ Quantum Physics Concepts
+## Quantum Physics Concepts
 
 ### Grover's Algorithm
 - **Principle**: Quantum search providing quadratic speedup over classical algorithms
@@ -125,18 +125,7 @@ Select your targeting pattern before attacking:
 - **Implementation**: Repeated weak measurements prevent state changes
 - **Game Mechanic**: Measurement-based protection against quantum attacks
 
-## 🎛️ Controls
-
-### Mouse Controls
-- **Left Click**: Select grid squares, place ships, activate buttons
-- **Mouse Wheel**: Scroll up/down through interface (both game modes)
-- **Scrollbar**: Drag for precise navigation
-
-### Keyboard Shortcuts
-- **ESC**: Cancel current selection
-- **Space**: Random ship placement (during setup)
-
-## 🔧 Technical Details
+## Technical Details
 
 ### Architecture
 - **Frontend**: Tkinter-based GUI with scrollable interface
@@ -144,20 +133,24 @@ Select your targeting pattern before attacking:
 - **Quantum Simulator**: AerSimulator for realistic quantum behavior
 - **Game Engine**: Turn-based state management with quantum weapon integration
 
+#### ***Note that this was programmed on WSL subsystem of Linux x64. This program will run with no issues on a Linux based operating system. Please beware MacOS removes the colours of the buttons.***
+
 ### Circuit Implementation
-- **3-qubit Grover circuits**: Represent 8 possible grid positions
-- **2-qubit EV circuits**: Model photon-ship interaction
-- **1-qubit Zeno circuits**: Simulate measurement-induced protection
+- **3-qubit Grover circuits**: Superposition of states across rows/columns
+- **2-qubit Grover circuits**: Superposition of states on a 2x2 mini-grid
+- **2-qubit EV circuits**: Model detection-free interaction
+- **1-qubit Zeno circuits**: Simulate evolution-freezing
 - **Real quantum mechanics**: All probability calculations follow quantum mechanical principles
 
-### File Structure
+### Directory Structure
 ```
 Qiskit/
-├── main.py                    # Game launcher
-├── multiplayer_ui.py          # Multiplayer interface
-├── single_player_ui.py        # Single player interface  
-├── quantum_weapons.py         # Quantum mechanics implementation
-├── game_controller.py         # Game logic controller
+├── main.py                   # Game launcher
+├── multiplayer_ui.py         # Multiplayer interface
+├── single_player_ui.py       # Single player interface 
+├── grovershot.py             # Grover's algorithm 
+├── quantum_weapons.py        # Quantum mechanics implementation
+├── game_controller.py        # Game logic controller
 ├── game_logic.py             # Core mechanics
 ├── ai_player.py              # AI opponent
 ├── assets/                   # Game graphics
@@ -167,26 +160,7 @@ Qiskit/
 └── README.md                 # This file
 ```
 
-## 🧠 Strategy Guide
-
-### Beginner Tips
-1. **Start with EV Scans**: Use reconnaissance to locate enemy ship clusters
-2. **Combine Weapons**: EV Scan → Grover Shot for maximum efficiency
-3. **Protect Valuable Ships**: Use Zeno Defense on ships in exposed positions
-4. **Targeting Modes**: Match targeting mode to weapon type
-
-### Advanced Strategies
-1. **Quantum Chains**: Chain EV scans to map enemy positions
-2. **Defensive Timing**: Apply Zeno protection before enemy discovers your ships
-3. **Resource Management**: Balance offensive and defensive quantum operations
-4. **Pattern Recognition**: Learn enemy placement and targeting patterns
-
-### Weapon Interactions
-- **Grover vs Zeno**: Zeno defense reduces Grover hit probability (85% → 8.5%)
-- **EV vs Zeno**: Zeno protection can obfuscate EV scan results
-- **Classical shots**: Unaffected by quantum interference
-
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -204,31 +178,9 @@ Qiskit/
 - Install required packages: `pip install qiskit qiskit-aer pillow numpy`
 - Check that all game files are present
 
-### Performance Tips
-- Close other applications for smoother quantum simulation
-- Use smaller grid sizes on slower computers
-- Reduce visual effects if experiencing lag
+## Contributing
 
-## 📚 Educational Value
-
-This game serves as an interactive introduction to quantum computing concepts:
-
-- **Quantum Algorithms**: Experience Grover's search advantage
-- **Quantum Measurement**: Understand interaction-free measurement principles
-- **Quantum Effects**: See how measurement affects quantum systems
-- **Practical Applications**: Connect theory to interactive examples
-
-Perfect for students, educators, and anyone curious about quantum mechanics!
-
-## 🤝 Contributing
-
-We welcome contributions! Areas for improvement:
-
-- Additional quantum algorithms (quantum teleportation, error correction)
-- Enhanced AI with quantum strategies
-- Network multiplayer support
-- Mobile interface adaptation
-- Educational mode with step-by-step explanations
+We welcome contributions
 
 ## 📄 License
 
@@ -239,18 +191,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Qiskit Team**: For the excellent quantum computing framework
 - **IBM Quantum**: For making quantum computing accessible
 - **Quantum Computing Community**: For inspiration and educational resources
-
-## 📞 Support
-
-If you encounter issues or have questions:
-
-1. Check the troubleshooting section above
-2. Review the game documentation
-3. Open an issue on GitHub
-4. Contact the development team
+- **Authors: Adam Tang, Qasim Bedford and Yann Janssen**
 
 ---
 
-**Experience quantum mechanics through gaming - where physics meets strategy!** ⚛️🎮
+**Experience quantum mechanics through gaming - where physics meets strategy.** 
 
-*"In the quantum realm, observation changes reality - use this power wisely in battle!"*
+*"In the quantum realm, observation changes reality - use this power wisely in battle."*
