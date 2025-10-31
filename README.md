@@ -2,6 +2,8 @@
 
 A custom-made battleship game that demonstrates quantum computing principles through interactive gameplay. Experience quantum mechanics concepts like Grover's algorithm, Elitzur-Vaidman bomb testing, and the quantum Zeno effect in this strategic game.
 
+**Authors: Adam Tang, Qasim Bedford and Yann Janssen**
+
 ##  Overview
 
 Quantum Battleships transforms the classic game by incorporating three fundamental quantum mechanics principles as weapons/utlities:
@@ -188,7 +190,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- **Qiskit Team**: For the excellent quantum computing framework
+- **Quantum Team UCL**: Thank you for providing this Hackathon opportunity, and shout out to the president: Daniel Aliev!
 - **IBM Quantum**: For making quantum computing accessible
 - **Quantum Computing Community**: For inspiration and educational resources
 - **Authors: Adam Tang, Qasim Bedford and Yann Janssen**
