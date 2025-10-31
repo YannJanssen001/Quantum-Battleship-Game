@@ -182,11 +182,11 @@ Qiskit/
 
 We welcome contributions
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Qiskit Team**: For the excellent quantum computing framework
 - **IBM Quantum**: For making quantum computing accessible
