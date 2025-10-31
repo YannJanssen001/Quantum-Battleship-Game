@@ -606,6 +606,10 @@ class MultiplayerBattleshipUI:
         self.target_canvas = canvas
         self.target_controller = controller
         
+        # Validate region was created successfully
+        if not self.selected_region:
+            return
+        
         # Highlight new selection with yellow overlay
         for rr, cc in self.selected_region:
             if 0 <= rr < self.grid_size and 0 <= cc < self.grid_size:
@@ -831,6 +835,7 @@ class MultiplayerBattleshipUI:
         self.clear_all_visual_effects(preserve_selection=True)
         
         self.selection_mode = mode
+        self.targeting_mode = mode  # Fix: Also update targeting_mode for validation
         self.mode_var.set(mode)
         # Don't clear selected_region - let the user keep their target selection
         
@@ -855,8 +860,19 @@ class MultiplayerBattleshipUI:
             
     def fire_quantum_weapon(self, weapon_type):
         """Execute player's selected quantum weapon."""
+        # Save current selection before any processing that might clear it
+        saved_region = getattr(self, 'selected_region', []).copy() if hasattr(self, 'selected_region') else []
+        saved_canvas = getattr(self, 'target_canvas', None)
+        saved_controller = getattr(self, 'target_controller', None)
+        
         # Clear stuck visual effects but preserve target selection
         self.clear_all_visual_effects(preserve_selection=True)
+        
+        # Restore selection if it was cleared accidentally
+        if hasattr(self, 'selected_region') and not self.selected_region and saved_region:
+            self.selected_region = saved_region
+            self.target_canvas = saved_canvas
+            self.target_controller = saved_controller
         
         # Check if we're in battle phase
         if self.game_phase != "battle":
